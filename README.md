@@ -134,54 +134,70 @@ npm run build
 
 下面提供一個「你可以直接貼給 AI」的提示詞模板，以及一段符合流程的示範回應。重點係：**AI 會先寫，再用工具檢查，唔啱就用工具修正**，而唔係靠估。
 
-### 你可以直接貼給 AI 的提示詞（Template）
+### 你可以直接貼給 AI 的提示詞（完整歌曲 / 推薦）
 
-把 `<...>` 內容改成你想要的主題/風格就得。
+把 `<...>` 內容改成你想要的主題/風格就得。呢個版本會引導 AI 生成「完整歌曲結構」，並且逐段用工具校對。
 
 ```text
-你而家可以使用 Cantonese Rhyme MCP 工具。請你寫一段粵語歌詞，並確保押韻與協音盡量自然。
+你而家可以使用 Cantonese Rhyme MCP 工具。請你寫一首完整粵語歌曲歌詞，並確保押韻與協音盡量自然。
 
 要求：
 1) 主題：<星空下城市漫步>
-2) 段落：8 行（兩段，每段 4 行）
-3) 押韻方案：AABBCCDD
-4) 押韻嚴格度：先用 strictness=finalTone（太窄先退到 wide）
-5) 協音檢查：toneConsistency=class
-6) 語感：香港口語、唔好太書面
-7) 流程（必做）：
-   - 先寫出初稿
-   - 用 cantonese_rhyme_diagnose_lyrics 檢查（帶 scheme、toneConsistency、ignoreBracketTags=true）
-   - 如果有不押韻或 tone 風險：用 cantonese_rhyme_candidates 找替代尾字/尾詞修正，必要時再跑一次 diagnose
-   - 最後輸出「最終歌詞」一份
+2) 結構（要有標籤行）：
+   - [Verse 1] 8 行
+   - [Chorus] 4 行
+   - [Verse 2] 8 行
+   - [Bridge] 4 行
+   - [Chorus] 4 行（最後副歌可輕微變化，但押韻要一樣）
+3) 押韻策略（務實、易成功）：
+   - Verse 用同一個韻母（strictness=final），Chorus 用另一個韻母（strictness=final）
+   - 如果你覺得自己寫到「卡字」，再把 strictness 退到 wide
+4) 協音檢查：toneConsistency=class
+5) 語感：香港口語、唔好太書面
+6) 流程（必做，逐段檢查，避免一次過寫完先發現全都唔押韻）：
+   - 先寫 Verse 1（8 行），然後立刻用 cantonese_rhyme_diagnose_lyrics 檢查 Verse 1（scheme=AABBCCDD、ignoreBracketTags=true）
+   - 修正 Verse 1：對於不押韻的行，用 cantonese_rhyme_candidates 查目標韻鍵的候選尾字/尾詞，然後只改句尾，再檢查直到 mismatch=0
+   - 同樣流程處理 Chorus（scheme=AAAA）、Verse 2（AABBCCDD）、Bridge（AAAA）
+   - 最後輸出「完整最終歌詞」（含標籤行）
 
 加分：
 - contextKeywords 用：星空、城市、路燈、夜風、漫步
 ```
 
-### 示範回應（節錄）
+### 你可以直接貼給 AI 的提示詞（短段落 / 快速試用）
 
-以下示範一個「AI 正確使用工具」的回應型態（為了可讀性，工具輸出只節錄關鍵欄位）。
-
-1) 初稿（AABBCCDD，先嘗試以 `ou` 韻收尾）
+如果你只係想測試工具是否接通，先用 8 行短段落就夠：
 
 ```text
+你而家可以使用 Cantonese Rhyme MCP 工具。請你寫 8 行粵語歌詞（兩段各 4 行），主題：<星空下城市漫步>。
+押韻方案：AABBCCDD，toneConsistency=class。
+先寫初稿，然後用 cantonese_rhyme_diagnose_lyrics 檢查；唔押韻就用 cantonese_rhyme_candidates 換句尾，再檢查直到 mismatch=0。
+```
+
+### 示範回應（完整歌曲 / 節錄工具輸出）
+
+以下示範一個「AI 正確使用工具」的回應型態（為了可讀性，工具輸出只節錄關鍵欄位；實際輸出會包含更多欄位）。
+
+1) 寫 Verse 1（先定一個韻母，例如 `ou`）
+
+```text
+[Verse 1]
 霓虹落喺玻璃窗邊閃住步
 夜風貼近領口偷笑跟我步
 喧嘩喺背後慢慢退成霧
 剩低心跳同星光照住路
-
-路燈拖長影子陪我行到舊
-想講嘅說話喺喉嚨打個結舊
-你嘅名字喺腦海轉兩圈又
-抬頭望到星空，仍然未夠
+的士聲遠去，轉角又返到
+我哋嘅影子，被路燈拉長到
+心事喺夜裡輕輕放低到
+抬頭望住星河，陪我慢慢到
 ```
 
-2) 用工具批量檢查押韻/協音（示範呼叫）
+2) 立刻用工具檢查 Verse 1（示範呼叫）
 
 ```json
 {
-  "lyrics": "霓虹落喺玻璃窗邊閃住步\n夜風貼近領口偷笑跟我步\n喧嘩喺背後慢慢退成霧\n剩低心跳同星光照住路\n\n路燈拖長影子陪我行到舊\n想講嘅說話喺喉嚨打個結舊\n你嘅名字喺腦海轉兩圈又\n抬頭望到星空，仍然未夠",
-  "strictness": "finalTone",
+  "lyrics": "[Verse 1]\n霓虹落喺玻璃窗邊閃住步\n夜風貼近領口偷笑跟我步\n喧嘩喺背後慢慢退成霧\n剩低心跳同星光照住路\n的士聲遠去，轉角又返到\n我哋嘅影子，被路燈拉長到\n心事喺夜裡輕輕放低到\n抬頭望住星河，陪我慢慢到",
+  "strictness": "final",
   "scheme": "AABBCCDD",
   "toneConsistency": "class",
   "ignoreBracketTags": true,
@@ -194,66 +210,77 @@ npm run build
 ```json
 {
   "summary": {
-    "okLineCount": 6,
-    "mismatchLineCount": 2,
-    "toneRiskLines": [7],
-    "skippedTagLines": []
-  },
-  "results": [
-    { "line": 1, "end": { "matchedText": "步", "final": "ou", "tone": 6 }, "ok": true },
-    { "line": 2, "end": { "matchedText": "步", "final": "ou", "tone": 6 }, "ok": true },
-    { "line": 3, "end": { "matchedText": "霧", "final": "ou", "tone": 6 }, "ok": true },
-    { "line": 4, "end": { "matchedText": "路", "final": "ou", "tone": 6 }, "ok": true },
-    { "line": 7, "end": { "matchedText": "又", "final": "au", "tone": 6 }, "ok": false, "toneRisk": true },
-    { "line": 8, "end": { "matchedText": "夠", "final": "au", "tone": 3 }, "ok": false }
-  ]
+    "mismatchLineCount": 0,
+    "toneRiskLines": []
+  }
 }
 ```
 
-3) 針對不押韻的行（第 7/8 行），用候選工具改尾字（示範呼叫）
-
-例如我希望第 7/8 行都改回 `ou6`（同「路/步/霧」一致），就可以查 `rhymeKey="ou6"`：
-
-```json
-{
-  "rhymeKey": "ou6",
-  "strictness": "finalTone",
-  "preferStyle": "content",
-  "limit": 20,
-  "contextKeywords": ["星空", "城市", "路燈", "夜風", "漫步"]
-}
-```
-
-示範候選（節錄）：
-
-```json
-{
-  "rhymeKey": "ou6",
-  "strictness": "finalTone",
-  "candidates": [
-    { "text": "路", "jyutping": "lou6" },
-    { "text": "步", "jyutping": "bou6" },
-    { "text": "霧", "jyutping": "mou6" },
-    { "text": "度", "jyutping": "dou6" }
-  ]
-}
-```
-
-4) 修正後最終歌詞（把第 7/8 行尾改回 `ou6`，再跑一次 diagnose 直到 mismatch=0）
+3) 寫 Chorus（換另一個韻母，例如 `aa`，副歌要有一句 hook 重複）
 
 ```text
+[Chorus]
+星空下我哋行到夜更斜啦
+城市咁嘈，都遮唔住心聲啦
+你笑一笑，我就乜都唔怕啦
+同你漫步，呢一幕記住啦
+```
+
+4) 檢查 Chorus（scheme=AAAA；唔押韻就用 candidates 換尾字再檢查）
+
+```json
+{
+  "lyrics": "[Chorus]\n星空下我哋行到夜更斜啦\n城市咁嘈，都遮唔住心聲啦\n你笑一笑，我就乜都唔怕啦\n同你漫步，呢一幕記住啦",
+  "strictness": "final",
+  "scheme": "AAAA",
+  "toneConsistency": "class",
+  "ignoreBracketTags": true
+}
+```
+
+5) 其餘段落同樣流程（Verse 2 用 AABBCCDD、Bridge 用 AAAA），最後輸出完整歌詞：
+
+```text
+[Verse 1]
 霓虹落喺玻璃窗邊閃住步
 夜風貼近領口偷笑跟我步
 喧嘩喺背後慢慢退成霧
 剩低心跳同星光照住路
+的士聲遠去，轉角又返到
+我哋嘅影子，被路燈拉長到
+心事喺夜裡輕輕放低到
+抬頭望住星河，陪我慢慢到
 
-路燈拖長影子陪我行到舊
-想講嘅說話喺喉嚨打個結舊
-你嘅名字喺腦海轉兩圈度
-抬頭望到星空，仍然未夠路
+[Chorus]
+星空下我哋行到夜更斜啦
+城市咁嘈，都遮唔住心聲啦
+你笑一笑，我就乜都唔怕啦
+同你漫步，呢一幕記住啦
+
+[Verse 2]
+行過彌敦道，霓虹又照住路
+你話將來遠，我話今晚先到
+人海裏擦身，偏偏就遇到
+你望我一眼，我就記到老
+夜更深，仍然唔捨得停步
+怕返到屋企，夢會散成霧
+如果要道別，就慢慢講到
+等天光之前，陪你再行到
+
+[Bridge]
+我唔想醒啦
+呢段夜太真啦
+就算明日變卦
+今晚都當永遠啦
+
+[Chorus]
+星空下我哋行到夜更斜啦
+城市咁嘈，都遮唔住心聲啦
+你笑一笑，我就乜都唔怕啦
+同你漫步，呢一幕記住啦
 ```
 
-> 提示：如果你覺得 `finalTone` 太難寫得順，可以把 `strictness` 退到 `wide`，讓 AI 有更多可用尾字，但仍然保持「聽感接近」。
+> 提示：對「整首歌」最穩陣做法係逐段檢查；因為一旦你寫到尾先檢查，修起上嚟會好痛苦。
 
 ## 作為 MCP Server 使用（給進階用戶）
 
