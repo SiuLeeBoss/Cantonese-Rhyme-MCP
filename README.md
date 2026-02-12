@@ -17,7 +17,7 @@
 
 ## 快速開始（給一般用戶）
 
-你只需要做兩件事：**準備好工具檔案**，然後**把它加進你正在使用的 AI（MCP）配置**。
+跟住做就得：**準備好工具檔案**，然後**把它加進你正在使用的 AI（MCP）配置**。
 
 ### 三分鐘清單（照做就能用）
 
@@ -28,9 +28,7 @@
 
 ### 第一步：下載並準備（只做一次）
 
-需求：Node.js（建議 18+）。如果你未安裝，去 Node.js 官方網站下載安裝即可。
-
-你可以用以下方式確認是否裝好（看到版本號就代表 OK）：
+需求：Node.js（建議 18+）。你可以用以下方式確認是否裝好（看到版本號就代表 OK）：
 
 ```bash
 node -v
@@ -119,9 +117,7 @@ npm run build
 
 #### 配置檔位置（常見）
 
-不同 MCP Host 的設定檔位置不一樣，但通常你會在該 Host 的「Settings / Developer / MCP」頁面找到入口。
-
-以 Claude Desktop 常見位置為例：
+通常你會在 MCP Host 的設定頁面找到入口。如果你用 Claude Desktop，設定檔常見位置為：
 - Windows：`%APPDATA%\Claude\claude_desktop_config.json`
 - macOS：`~/Library/Application Support/Claude/claude_desktop_config.json`
 
@@ -242,42 +238,19 @@ npm run build
 
 ```text
 [Verse 1]
-霓虹落喺玻璃窗邊閃住步
-夜風貼近領口偷笑跟我步
-喧嘩喺背後慢慢退成霧
-剩低心跳同星光照住路
-的士聲遠去，轉角又返到
-我哋嘅影子，被路燈拉長到
-心事喺夜裡輕輕放低到
-抬頭望住星河，陪我慢慢到
+（同上，略）
 
 [Chorus]
-星空下我哋行到夜更斜啦
-城市咁嘈，都遮唔住心聲啦
-你笑一笑，我就乜都唔怕啦
-同你漫步，呢一幕記住啦
+（同上，略）
 
 [Verse 2]
-行過彌敦道，霓虹又照住路
-你話將來遠，我話今晚先到
-人海裏擦身，偏偏就遇到
-你望我一眼，我就記到老
-夜更深，仍然唔捨得停步
-怕返到屋企，夢會散成霧
-如果要道別，就慢慢講到
-等天光之前，陪你再行到
+（逐段寫 → 逐段檢查 → 唔 ok 就只改句尾 → 再檢查）
 
 [Bridge]
-我唔想醒啦
-呢段夜太真啦
-就算明日變卦
-今晚都當永遠啦
+（逐段寫 → 逐段檢查 → 唔 ok 就只改句尾 → 再檢查）
 
 [Chorus]
-星空下我哋行到夜更斜啦
-城市咁嘈，都遮唔住心聲啦
-你笑一笑，我就乜都唔怕啦
-同你漫步，呢一幕記住啦
+（同上，略）
 ```
 
 > 提示：對「整首歌」最穩陣做法係逐段檢查；因為一旦你寫到尾先檢查，修起上嚟會好痛苦。
@@ -288,13 +261,7 @@ npm run build
 - `npm start`：`node build/index.js`
 - CLI bin：`cantonese-rhyme-mcp`（對應 `./build/index.js`）
 
-### 方式 A：直接用 node 啟動（最簡單、最不易出錯）
-
-在你的 MCP Host 配置中，使用：
-- command：`node`
-- args：`["<你的專案路徑>/build/index.js"]`
-
-### 方式 B：用 npm link（讓系統出現 `cantonese-rhyme-mcp` 指令）
+### 用 npm link（讓系統出現 `cantonese-rhyme-mcp` 指令）
 
 ```bash
 npm install
